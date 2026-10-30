@@ -4,17 +4,17 @@
   const CHECK_MS = 10000;
     // ===== ตั้งค่าสีและเงาแผงควบคุม =====
     const PANEL_STYLE = {
-        normalBg: "#78b6f4",       // พื้นหลังปกติ
-        normalText: "#1e293b",     // สีตัวอักษรปกติ
+        normalBg: "#D2E9AF",       // พื้นหลังปกติ
+        normalText: "#04182F",     // สีตัวอักษรปกติ
 
-        alarmBg: "#7f1d1d",        // พื้นหลังตอนแจ้งเตือน
+        alarmBg: "#A2A50F",        // พื้นหลังตอนแจ้งเตือน
         alarmText: "#ffffff",      // ตัวอักษรตอนแจ้งเตือน
 
         normalResult: "#dce6f0",   // กล่องแสดงผลปกติ
-        alarmResult: "#991b1b",    // กล่องแสดงผลตอนเตือน
+        alarmResult: "#e91a1a",    // กล่องแสดงผลตอนเตือน
 
         shadow: "0 8px 30px rgba(0,0,0,0.95)", // เงาแผง
-        shadowButton: "0 4px 16px rgba(0,0,0,0.45)"
+        shadowButton: "0 4px 16px rgba(0,0,0,0.65)"
     };
   const REPEAT_COUNT = 3;
   const REPEAT_GAP_MS = 5000;
@@ -51,10 +51,10 @@
     "position:fixed;top:12px;right:12px;width:320px;" +
     "max-width:calc(100vw - 24px);max-height:calc(100vh - 24px);" +
     "overflow-y:auto;z-index:2147483647;box-sizing:border-box;" +
-    "background:#eef3f8;color:#1e293b;padding:16px;" +
-    "border-radius:14px;" +
+    "background:" + PANEL_STYLE.normalBg + ";" +
+    "color:" + PANEL_STYLE.normalText + ";" +
+    "padding:16px;border-radius:14px;" +
     "box-shadow:" + PANEL_STYLE.shadow + ";" +
-    "box-shadow:" + PANEL_STYLE.shadowButton + ";cursor:pointer";
     "font:15px/1.6 system-ui,sans-serif;" +
     "transition:background 0.2s";
 
@@ -67,7 +67,7 @@
     </div>
 
     <button id="bw-enable" style="
-      width:100%;padding:14px;background:#2563eb;color:white;
+      width:100%;padding:14px;background:#E83651;color:white;
       border:0;border-radius:8px;font-size:16px;font-weight:bold;
       cursor:pointer">
       🔊 เปิดเสียงและเริ่มเฝ้าป้าย
@@ -86,7 +86,7 @@
     "z-index:2147483647;padding:12px 16px;" +
     "background:#2563eb;color:white;border:0;" +
     "border-radius:12px;font-size:15px;font-weight:bold;" +
-    "box-shadow:0 4px 16px #0004;cursor:pointer";
+    "box-shadow:" + PANEL_STYLE.shadowButton + ";cursor:pointer";
 
   document.body.appendChild(launcher);
 
@@ -128,6 +128,19 @@
       btn.style.display = show ? "block" : "none";
     }
   }
+
+  function updateControlButtons() {
+    const resume = panel.querySelector("#bw-resume");
+    const pause = panel.querySelector("#bw-pause");
+
+    if (resume) {
+        resume.style.display = watching ? "none" : "block";
+    }
+
+    if (pause) {
+        pause.style.display = watching ? "block" : "none";
+    }
+   }
 
   function closeNotifications() {
     for (const n of activeNotifications) {
@@ -204,6 +217,8 @@
 
     setPanelTheme(true);
     updateAckButton(true);
+
+    updateControlButtons();
 
     document.title = "🚨 รถถึงป้าย " + TARGET;
 
@@ -312,7 +327,7 @@
         ยังไม่พบรถ
       </div>
 
-      <div style="font-size:12px;color:#64748b;margin:8px 0">
+      <div style="font-size:12px;color:#1e293b;margin:8px 0">
         🔊 เสียง: พร้อมใช้งาน<br>
         🔔 Notification: ${permission}
       </div>
@@ -361,6 +376,8 @@
     panel.querySelector("#bw-ack").onclick = () => {
       stopAlarm();
 
+      updateControlButtons();
+
       status(
         watching
           ? "รับทราบแล้ว · กำลังเฝ้าป้ายต่อ"
@@ -374,6 +391,8 @@
 
       watching = true;
 
+      updateControlButtons();
+
       if (checkTimer === null) {
         checkTimer = setInterval(check, CHECK_MS);
       }
@@ -386,6 +405,8 @@
     // หยุดเฝ้าป้าย
     panel.querySelector("#bw-pause").onclick = () => {
       watching = false;
+
+      updateControlButtons();
 
       clearInterval(checkTimer);
       checkTimer = null;
@@ -405,6 +426,8 @@
     panel.querySelector("#bw-destroy").onclick = () => {
       window.busWatcher.destroy();
     };
+
+    updateControlButtons();
   }
 
   // แสดงแผงกลับมา
